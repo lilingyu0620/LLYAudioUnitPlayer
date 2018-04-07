@@ -12,15 +12,29 @@
 
 const uint32_t BUFFER_SIZE = 0x10000;
 
+@interface LLYAudioUnitPlayer ()
+
+@property(nonatomic,copy)NSString *pcmPath;
+
+@end
+
 @implementation LLYAudioUnitPlayer{
     AudioUnit playerAudioUnit;
     NSInputStream *inputStream;
     AudioBufferList *bufferList;
 }
 
+- (instancetype)initWithPCMPath:(NSString *)pcmPath{
+    self = [super init];
+    if (self) {
+        self.pcmPath = pcmPath;
+    }
+    return self;
+}
+
 - (void)initAudioUnit{
     
-    NSURL *url = [[NSBundle mainBundle] URLForResource:@"abc" withExtension:@"pcm"];
+    NSURL *url = [NSURL fileURLWithPath:self.pcmPath];
     inputStream = [NSInputStream inputStreamWithURL:url];
     if (!inputStream) {
         NSLog(@"打开文件失败!!!!%@",url);

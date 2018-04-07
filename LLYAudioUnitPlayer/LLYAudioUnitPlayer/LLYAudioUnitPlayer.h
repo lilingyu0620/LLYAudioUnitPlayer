@@ -10,6 +10,8 @@
 
 @interface LLYAudioUnitPlayer : NSObject
 
+- (instancetype)initWithPCMPath:(NSString *)pcmPath;
+
 - (void)play;
 
 @end
