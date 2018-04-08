@@ -11,11 +11,13 @@
 #import "PAirSandbox.h"
 #import "LLYAudioUnitRecord.h"
 #import "CommonUtil.h"
+#import "LLYAudioUnitConverter.h"
 
 @interface ViewController ()
 
 @property(nonatomic,strong)LLYAudioUnitPlayer *player;
 @property(nonatomic,strong)LLYAudioUnitRecord *record;
+@property (nonatomic, strong) LLYAudioUnitConverter *converter;
 
 @end
 
@@ -44,6 +46,10 @@
 - (IBAction)playRecord:(id)sender {
     self.player = [[LLYAudioUnitPlayer alloc]initWithPCMPath:[LLYAudioUnitRecord recordPath]];
     [self.player play];
+}
+- (IBAction)playMP3:(id)sender {
+    self.converter = [[LLYAudioUnitConverter alloc]init];
+    [self.converter play];
 }
 
 - (void)didReceiveMemoryWarning {
