@@ -11,12 +11,11 @@
 #import <AVFoundation/AVFoundation.h>
 #import "CommonUtil.h"
 
-const uint32_t CONST_BUFFER_SIZE = 0x10000;
-
 #define INPUT_BUS (1)
 #define OUTPUT_BUS (0)
 #define NO_MORE_DATA (-12306)
 
+const uint32_t CONST_BUFFER_SIZE = 0x10000;
 
 @implementation LLYAudioUnitConverter{
     
@@ -151,7 +150,7 @@ const uint32_t CONST_BUFFER_SIZE = 0x10000;
     
     //设置回调
     AURenderCallbackStruct playCallback;
-    playCallback.inputProc = PlayCallback;
+    playCallback.inputProc = ConPlayCallback;
     playCallback.inputProcRefCon = (__bridge void *)self;
     status = AudioUnitSetProperty(audioUnit,
                                   kAudioUnitProperty_SetRenderCallback,
@@ -195,7 +194,7 @@ OSStatus InputDataProc(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataP
     }
 }
 
-OSStatus PlayCallback(void *inRefCon,
+OSStatus ConPlayCallback(void *inRefCon,
                       AudioUnitRenderActionFlags *ioActionFlags,
                       const AudioTimeStamp *inTimeStamp,
                       UInt32 inBusNumber,

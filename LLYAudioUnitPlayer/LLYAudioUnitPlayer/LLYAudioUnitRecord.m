@@ -13,7 +13,8 @@
 
 #define INPUT_BUS 1
 #define OUTPUT_BUS 0
-#define CONST_BUFFER_SIZE 2048*2*10
+
+const uint32_t BUFFERSIZE = 0x10000;
 
 @implementation LLYAudioUnitRecord{
     AudioUnit recordAudioUnit;
@@ -75,16 +76,16 @@
     bufferList = (AudioBufferList *)malloc(sizeof(AudioBufferList) + (numberBuffers - 1) * sizeof(AudioBuffer));
     bufferList->mNumberBuffers = numberBuffers;
     bufferList->mBuffers[0].mNumberChannels = 1;
-    bufferList->mBuffers[0].mDataByteSize = CONST_BUFFER_SIZE;
-    bufferList->mBuffers[0].mData = malloc(CONST_BUFFER_SIZE);
+    bufferList->mBuffers[0].mDataByteSize = BUFFERSIZE;
+    bufferList->mBuffers[0].mData = malloc(BUFFERSIZE);
     
     for (int i =1; i < numberBuffers; ++i) {
         bufferList->mBuffers[i].mNumberChannels = 1;
-        bufferList->mBuffers[i].mDataByteSize = CONST_BUFFER_SIZE;
-        bufferList->mBuffers[i].mData = malloc(CONST_BUFFER_SIZE);
+        bufferList->mBuffers[i].mDataByteSize = BUFFERSIZE;
+        bufferList->mBuffers[i].mData = malloc(BUFFERSIZE);
     }
     
-    buffer = malloc(CONST_BUFFER_SIZE);
+    buffer = malloc(BUFFERSIZE);
     
     // audio unit new
     AudioComponentDescription audioDesc;
@@ -160,7 +161,7 @@
     }
     
     AURenderCallbackStruct playCallback;
-    playCallback.inputProc = PlayCallback;
+    playCallback.inputProc = OutPlayCallback;
     playCallback.inputProcRefCon = (__bridge void *)self;
     status = AudioUnitSetProperty(recordAudioUnit,
                                   kAudioUnitProperty_SetRenderCallback,
@@ -198,7 +199,7 @@ static OSStatus RecordCallback(void *inRefCon,
     return noErr;
 }
 
-static OSStatus PlayCallback(void *inRefCon,
+static OSStatus OutPlayCallback(void *inRefCon,
                              AudioUnitRenderActionFlags *ioActionFlags,
                              const AudioTimeStamp *inTimeStamp,
                              UInt32 inBusNumber,
@@ -208,7 +209,7 @@ static OSStatus PlayCallback(void *inRefCon,
     memcpy(ioData->mBuffers[0].mData, record->bufferList->mBuffers[0].mData, record->bufferList->mBuffers[0].mDataByteSize);
     ioData->mBuffers[0].mDataByteSize = record->bufferList->mBuffers[0].mDataByteSize;
     
-    NSInteger bytes = CONST_BUFFER_SIZE < ioData->mBuffers[1].mDataByteSize * 2 ? CONST_BUFFER_SIZE : ioData->mBuffers[1].mDataByteSize * 2; //
+    NSInteger bytes = BUFFERSIZE < ioData->mBuffers[1].mDataByteSize * 2 ? BUFFERSIZE : ioData->mBuffers[1].mDataByteSize * 2; //
     bytes = [record->inputStream read:record->buffer maxLength:bytes];
     
     for (int i = 0; i < bytes; ++i) {

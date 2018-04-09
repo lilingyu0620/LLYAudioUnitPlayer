@@ -12,12 +12,14 @@
 #import "LLYAudioUnitRecord.h"
 #import "CommonUtil.h"
 #import "LLYAudioUnitConverter.h"
+#import "LLYAudioUnitExtPlayer.h"
 
 @interface ViewController ()
 
 @property(nonatomic,strong)LLYAudioUnitPlayer *player;
 @property(nonatomic,strong)LLYAudioUnitRecord *record;
 @property (nonatomic, strong) LLYAudioUnitConverter *converter;
+@property (nonatomic, strong) LLYAudioUnitExtPlayer *extPlayer;
 
 @end
 
@@ -50,6 +52,10 @@
 - (IBAction)playMP3:(id)sender {
     self.converter = [[LLYAudioUnitConverter alloc]init];
     [self.converter play];
+}
+- (IBAction)extPlayMp3:(id)sender {
+    self.extPlayer = [[LLYAudioUnitExtPlayer alloc]init];
+    [self.extPlayer play];
 }
 
 - (void)didReceiveMemoryWarning {

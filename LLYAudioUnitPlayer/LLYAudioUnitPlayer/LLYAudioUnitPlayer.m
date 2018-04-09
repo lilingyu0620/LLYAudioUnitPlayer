@@ -21,7 +21,6 @@ const uint32_t BUFFER_SIZE = 0x10000;
 @implementation LLYAudioUnitPlayer{
     AudioUnit playerAudioUnit;
     NSInputStream *inputStream;
-    AudioBufferList *bufferList;
 }
 
 - (instancetype)initWithPCMPath:(NSString *)pcmPath{
@@ -59,13 +58,6 @@ const uint32_t BUFFER_SIZE = 0x10000;
     //AudioUnit裸创建
     AudioComponent audioComponent = AudioComponentFindNext(NULL, &audioUnitDesc);
     AudioComponentInstanceNew(audioComponent, &playerAudioUnit);
-    
-    //缓存buffer
-    bufferList = (AudioBufferList *)malloc(sizeof(AudioBufferList));
-    bufferList->mNumberBuffers = 1;
-    bufferList->mBuffers[0].mNumberChannels = 1;
-    bufferList->mBuffers[0].mDataByteSize = BUFFER_SIZE;
-    bufferList->mBuffers[0].mData = malloc(BUFFER_SIZE);
     
     //通用参数设置,这里是设置扬声器
     OSStatus status = noErr;
@@ -116,15 +108,6 @@ const uint32_t BUFFER_SIZE = 0x10000;
 - (void)stop{
     
     AudioOutputUnitStop(playerAudioUnit);
-    
-    if (bufferList != NULL) {
-        if (bufferList->mBuffers[0].mData) {
-            free(bufferList->mBuffers[0].mData);
-            bufferList->mBuffers[0].mData = NULL;
-        }
-        free(bufferList);
-        bufferList = NULL;
-    }
     [inputStream close];
 }
 
@@ -142,21 +125,5 @@ static OSStatus PlayCallback(void *inRefCon,AudioUnitRenderActionFlags *ioAction
         });
     }
     return noErr;
-}
-
-- (void)printAudioStreamBasicDescription:(AudioStreamBasicDescription)asbd {
-    char formatID[5];
-    UInt32 mFormatID = CFSwapInt32HostToBig(asbd.mFormatID);
-    bcopy (&mFormatID, formatID, 4);
-    formatID[4] = '\0';
-    printf("Sample Rate:         %10.0f\n",  asbd.mSampleRate);
-    printf("Format ID:           %10s\n",    formatID);
-    printf("Format Flags:        %10X\n",    (unsigned int)asbd.mFormatFlags);
-    printf("Bytes per Packet:    %10d\n",    (unsigned int)asbd.mBytesPerPacket);
-    printf("Frames per Packet:   %10d\n",    (unsigned int)asbd.mFramesPerPacket);
-    printf("Bytes per Frame:     %10d\n",    (unsigned int)asbd.mBytesPerFrame);
-    printf("Channels per Frame:  %10d\n",    (unsigned int)asbd.mChannelsPerFrame);
-    printf("Bits per Channel:    %10d\n",    (unsigned int)asbd.mBitsPerChannel);
-    printf("\n");
 }
 @end

@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <AudioUnit/AudioUnit.h>
 
 @interface CommonUtil : NSObject
 
