@@ -16,6 +16,7 @@
 		0A0FF0D5207788C600B9AEF2 /* LLYAudioUnitPlayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A0FF0D4207788C600B9AEF2 /* LLYAudioUnitPlayerTests.m */; };
 		0A0FF10120778A1C00B9AEF2 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A0FF10020778A1C00B9AEF2 /* AVFoundation.framework */; };
 		0A7ED6EB207B232200C82126 /* LLYAudioUnitExtPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A7ED6EA207B232200C82126 /* LLYAudioUnitExtPlayer.m */; };
+		0A7ED6EE207B772D00C82126 /* LLYAUGraphRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A7ED6ED207B772D00C82126 /* LLYAUGraphRecord.m */; };
 		0A942C652079F75B005EB498 /* LLYAudioUnitConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A942C642079F75B005EB498 /* LLYAudioUnitConverter.m */; };
 		0A942C672079F787005EB498 /* abc.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0A942C662079F787005EB498 /* abc.mp3 */; };
 		0AB002B12077BD3A009EFEC9 /* abc.pcm in Resources */ = {isa = PBXBuildFile; fileRef = 0AB002B02077BD3A009EFEC9 /* abc.pcm */; };
@@ -66,6 +67,8 @@
 		0A0FF10220778A2700B9AEF2 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
 		0A7ED6E9207B232200C82126 /* LLYAudioUnitExtPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LLYAudioUnitExtPlayer.h; sourceTree = "<group>"; };
 		0A7ED6EA207B232200C82126 /* LLYAudioUnitExtPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LLYAudioUnitExtPlayer.m; sourceTree = "<group>"; };
+		0A7ED6EC207B772D00C82126 /* LLYAUGraphRecord.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LLYAUGraphRecord.h; sourceTree = "<group>"; };
+		0A7ED6ED207B772D00C82126 /* LLYAUGraphRecord.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LLYAUGraphRecord.m; sourceTree = "<group>"; };
 		0A942C632079F75B005EB498 /* LLYAudioUnitConverter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LLYAudioUnitConverter.h; sourceTree = "<group>"; };
 		0A942C642079F75B005EB498 /* LLYAudioUnitConverter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LLYAudioUnitConverter.m; sourceTree = "<group>"; };
 		0A942C662079F787005EB498 /* abc.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = abc.mp3; sourceTree = "<group>"; };
@@ -143,6 +146,8 @@
 				0A942C642079F75B005EB498 /* LLYAudioUnitConverter.m */,
 				0A7ED6E9207B232200C82126 /* LLYAudioUnitExtPlayer.h */,
 				0A7ED6EA207B232200C82126 /* LLYAudioUnitExtPlayer.m */,
+				0A7ED6EC207B772D00C82126 /* LLYAUGraphRecord.h */,
+				0A7ED6ED207B772D00C82126 /* LLYAUGraphRecord.m */,
 				0A0FF0BB207788C600B9AEF2 /* AppDelegate.h */,
 				0A0FF0BC207788C600B9AEF2 /* AppDelegate.m */,
 				0A0FF0BE207788C600B9AEF2 /* ViewController.h */,
@@ -344,6 +349,7 @@
 				0A0FF0C0207788C600B9AEF2 /* ViewController.m in Sources */,
 				0ADC67E3207883C500CA238C /* LLYAudioUnitRecord.m in Sources */,
 				0A0FF0CB207788C600B9AEF2 /* main.m in Sources */,
+				0A7ED6EE207B772D00C82126 /* LLYAUGraphRecord.m in Sources */,
 				0ADC67E02078836200CA238C /* PAirSandbox.m in Sources */,
 				0A942C652079F75B005EB498 /* LLYAudioUnitConverter.m in Sources */,
 				0A0FF0BD207788C600B9AEF2 /* AppDelegate.m in Sources */,

@@ -13,6 +13,7 @@
 #import "CommonUtil.h"
 #import "LLYAudioUnitConverter.h"
 #import "LLYAudioUnitExtPlayer.h"
+#import "LLYAUGraphRecord.h"
 
 @interface ViewController ()
 
@@ -20,7 +21,7 @@
 @property(nonatomic,strong)LLYAudioUnitRecord *record;
 @property (nonatomic, strong) LLYAudioUnitConverter *converter;
 @property (nonatomic, strong) LLYAudioUnitExtPlayer *extPlayer;
-
+@property (nonatomic, strong) LLYAUGraphRecord *auGraphPlayer;
 @end
 
 @implementation ViewController
@@ -28,6 +29,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a ni
+    [[PAirSandbox sharedInstance] showSandboxBrowser];
 }
 
 - (IBAction)playPCM:(id)sender {
@@ -56,6 +58,10 @@
 - (IBAction)extPlayMp3:(id)sender {
     self.extPlayer = [[LLYAudioUnitExtPlayer alloc]init];
     [self.extPlayer play];
+}
+- (IBAction)auGraphPlayer:(id)sender {
+    self.auGraphPlayer = [[LLYAUGraphRecord alloc]init];
+    [self.auGraphPlayer start];
 }
 
 - (void)didReceiveMemoryWarning {
