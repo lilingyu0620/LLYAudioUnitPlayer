@@ -9,7 +9,7 @@
 //播放本地音频+录音+混合+播放
 //一步步来 1.先播放本地音频
 //2.加入录音功能
-//3.将录音音频和本地音频送给mix
+//3.将录音音频和本地音频送给mix mix的输出绑定给io的输出 done.
 
 #import "LLYAUGraphRecord.h"
 #import <AudioUnit/AudioUnit.h>

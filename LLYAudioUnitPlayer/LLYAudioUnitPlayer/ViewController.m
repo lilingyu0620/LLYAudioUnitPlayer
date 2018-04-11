@@ -14,6 +14,7 @@
 #import "LLYAudioUnitConverter.h"
 #import "LLYAudioUnitExtPlayer.h"
 #import "LLYAUGraphRecord.h"
+#import "LLYVideoPlayerViewController.h"
 
 @interface ViewController ()
 
@@ -29,7 +30,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a ni
-    [[PAirSandbox sharedInstance] showSandboxBrowser];
+//    [[PAirSandbox sharedInstance] showSandboxBrowser];
 }
 
 - (IBAction)playPCM:(id)sender {
@@ -62,6 +63,11 @@
 - (IBAction)auGraphPlayer:(id)sender {
     self.auGraphPlayer = [[LLYAUGraphRecord alloc]init];
     [self.auGraphPlayer start];
+}
+- (IBAction)videoPlayer:(id)sender {
+    
+    LLYVideoPlayerViewController *videoPlayerVC = [[LLYVideoPlayerViewController alloc]init];
+    [self presentViewController:videoPlayerVC animated:YES completion:nil];
 }
 
 - (void)didReceiveMemoryWarning {
