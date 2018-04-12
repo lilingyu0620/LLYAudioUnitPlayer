@@ -10,9 +10,13 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AudioUnit/AudioUnit.h>
 
+@class LLYAudioPlayer;
+
 @protocol LLYAudioPlayerDelegate <NSObject>
 
 - (AudioBufferList *)audioData;
+
+- (void)onPlayToEnd:(LLYAudioPlayer *)player;
 
 @end
 

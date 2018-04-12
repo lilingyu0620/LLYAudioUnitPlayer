@@ -16,13 +16,14 @@
 #import "LLYAUGraphRecord.h"
 #import "LLYVideoPlayerViewController.h"
 
-@interface ViewController ()
+@interface ViewController ()<CAAnimationDelegate>
 
 @property(nonatomic,strong)LLYAudioUnitPlayer *player;
 @property(nonatomic,strong)LLYAudioUnitRecord *record;
 @property (nonatomic, strong) LLYAudioUnitConverter *converter;
 @property (nonatomic, strong) LLYAudioUnitExtPlayer *extPlayer;
 @property (nonatomic, strong) LLYAUGraphRecord *auGraphPlayer;
+
 @end
 
 @implementation ViewController

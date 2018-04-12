@@ -75,8 +75,10 @@ static OSStatus PlayCallback(void *inRefCon,
                              AudioBufferList *ioData){
     LLYAudioPlayer *player = (__bridge LLYAudioPlayer *)inRefCon;
     if (!player->bufferList ||  player->readerSize + ioData->mBuffers[0].mDataByteSize > player->bufferList->mBuffers[0].mDataByteSize) {
-        player->bufferList = [player->_delegate audioData];
-        player->readerSize = 0;
+        if ([player.delegate respondsToSelector:@selector(audioData)]) {
+            player->bufferList = [player->_delegate audioData];
+            player->readerSize = 0;
+        }
     }
     
     if (!player->bufferList || player->bufferList->mNumberBuffers == 0) {
@@ -100,10 +102,15 @@ static OSStatus PlayCallback(void *inRefCon,
 
 - (void)stop{
     AudioOutputUnitStop(ioUnit);
+    if ([self.delegate respondsToSelector:@selector(onPlayToEnd:)]) {
+        [self.delegate onPlayToEnd:self];
+    }
+}
+
+- (void)dealloc{
     AudioUnitUninitialize(ioUnit);
     AudioComponentInstanceDispose(ioUnit);
 }
-
 - (void)printAudioStreamBasicDescription:(AudioStreamBasicDescription)asbd {
     char formatID[5];
     UInt32 mFormatID = CFSwapInt32HostToBig(asbd.mFormatID);

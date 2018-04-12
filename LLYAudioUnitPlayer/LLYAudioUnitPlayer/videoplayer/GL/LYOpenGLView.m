@@ -327,11 +327,17 @@ const GLfloat kColorConversion601FullRange[] = {
 	glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, quadVertexData);
 	glEnableVertexAttribArray(ATTRIB_VERTEX);
     
+//    GLfloat quadTextureData[] =  { // 正常坐标
+//        0, 1,
+//        1, 1,
+//        0, 0,
+//        1, 0
+//    };
     GLfloat quadTextureData[] =  { // 正常坐标
-        0, 1,
         1, 1,
+        1, 0,
+        0, 1,
         0, 0,
-        1, 0
     };
 	
 	glVertexAttribPointer(ATTRIB_TEXCOORD, 2, GL_FLOAT, 0, 0, quadTextureData);

@@ -26,6 +26,11 @@
 @property (nonatomic , strong) AVAssetReaderTrackOutput *mReaderAudioTrackOutput;
 @property (nonatomic , assign) AudioStreamBasicDescription fileFormat;
 
+// 时间戳
+@property (nonatomic, assign) long mAudioTimeStamp;
+@property (nonatomic, assign) long mVideoTimeStamp;
+
+
 @end
 
 @implementation LLYVideoPlayerViewController
@@ -38,6 +43,19 @@
     
     self.audioPlayer = [[LLYAudioPlayer alloc]init];
     self.audioPlayer.delegate = self;
+    
+    [self.glView setupGL];
+    self.mDisplayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(displayLinkCallBack:)];
+    [self.mDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    [self.mDisplayLink setPaused:YES];
+}
+
+- (void)viewWillDisappear:(BOOL)animated{
+    [self.mDisplayLink setPaused:YES];
+    self.mDisplayLink = nil;
+    self.glView = nil;
+    self.glView.layer.contents = nil;
+    
 }
 
 - (void)loadAsset {
@@ -125,6 +143,8 @@
     else {
         NSLog(@"Start reading success.");
         [self.audioPlayer play];
+        [self.mDisplayLink setPaused:NO];
+        self.mAudioTimeStamp = self.mVideoTimeStamp = 0;
     }
 }
 
@@ -177,12 +197,41 @@
     CMTime presentationTimeStamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
     int timeStamp = (1000 * (int)presentationTimeStamp.value) / presentationTimeStamp.timescale;
     NSLog(@"audio timestamp %d", timeStamp);
+    self.mAudioTimeStamp = timeStamp;
     
     CFRelease(sampleBuffer);
     
     return &_audioBufferList;
 }
 
+- (void)displayLinkCallBack:(CADisplayLink *)sender{
+    
+    if (self.mVideoTimeStamp < self.mAudioTimeStamp) {
+        CMSampleBufferRef videoSampleBuffer = [self.mReaderVideoTrackOutput copyNextSampleBuffer];
+        if (!videoSampleBuffer) {
+            return;
+        }
+        
+        CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(videoSampleBuffer);
+        if (pixelBuffer) {
+            [self.glView displayPixelBuffer:pixelBuffer];
+            
+            CMTime presentationTimeStamp = CMSampleBufferGetPresentationTimeStamp(videoSampleBuffer);
+            int timeStamp = (1000 * (int)presentationTimeStamp.value) / presentationTimeStamp.timescale;
+            NSLog(@"video timestamp %d", timeStamp);
+            self.mVideoTimeStamp = timeStamp;
+        }
+        CFRelease(videoSampleBuffer);
+    }
+}
+
+- (void)onPlayToEnd:(LLYAudioPlayer *)player{
+    [self.mDisplayLink setPaused:YES];
+}
+
+- (void)dealloc{
+    NSLog(@"llyvideoplayer dealloc");
+}
 
 /*
 #pragma mark - Navigation
