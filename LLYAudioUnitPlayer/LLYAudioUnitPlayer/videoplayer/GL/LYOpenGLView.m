@@ -150,16 +150,23 @@ const GLfloat kColorConversion601FullRange[] = {
 	glEnableVertexAttribArray(ATTRIB_TEXCOORD);
 	glVertexAttribPointer(ATTRIB_TEXCOORD, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
 	
+    //创建帧缓冲区
 	glGenFramebuffers(1, &_frameBufferHandle);
+    //绑定帧缓冲到渲染管线
 	glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferHandle);
-	
+    
+	//创建绘制缓冲
 	glGenRenderbuffers(1, &_colorBufferHandle);
+    //绑定绘制缓冲到渲染管线
 	glBindRenderbuffer(GL_RENDERBUFFER, _colorBufferHandle);
 	
+    //为绘制缓冲区分配存储区，此处将CAEAGLLayer的绘制存储区作为绘制缓冲区的存储区
 	[_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
+    //获取绘制缓冲区的像素宽度和高度
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_backingWidth);
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_backingHeight);
 
+    //将绘制缓冲区绑定到帧缓冲区
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _colorBufferHandle);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		NSLog(@"Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -323,7 +330,7 @@ const GLfloat kColorConversion601FullRange[] = {
 			 normalizedSamplingSize.width, normalizedSamplingSize.height,
 	};
 	
-	// 更新顶点数据
+	//设置物体坐标
 	glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, quadVertexData);
 	glEnableVertexAttribArray(ATTRIB_VERTEX);
     
@@ -333,7 +340,8 @@ const GLfloat kColorConversion601FullRange[] = {
 //        0, 0,
 //        1, 0
 //    };
-    GLfloat quadTextureData[] =  { // 正常坐标
+    //设置纹理坐标
+    GLfloat quadTextureData[] =  { // 顺时针旋转90度
         1, 1,
         1, 0,
         0, 1,
@@ -347,6 +355,7 @@ const GLfloat kColorConversion601FullRange[] = {
 
 	glBindRenderbuffer(GL_RENDERBUFFER, _colorBufferHandle);
     
+    //将绘制的结果显示在屏幕上
     if ([EAGLContext currentContext] == _context) {
         [_context presentRenderbuffer:GL_RENDERBUFFER];
     }
