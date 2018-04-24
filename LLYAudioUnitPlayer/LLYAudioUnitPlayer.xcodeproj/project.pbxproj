@@ -26,6 +26,7 @@
 		0A7ED6EE207B772D00C82126 /* LLYAUGraphRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A7ED6ED207B772D00C82126 /* LLYAUGraphRecord.m */; };
 		0A942C652079F75B005EB498 /* LLYAudioUnitConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A942C642079F75B005EB498 /* LLYAudioUnitConverter.m */; };
 		0A942C672079F787005EB498 /* abc.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0A942C662079F787005EB498 /* abc.mp3 */; };
+		0A98667620843FFC0074CC2C /* LLYAudioQueuePlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A98667520843FFC0074CC2C /* LLYAudioQueuePlayer.m */; };
 		0AB002B12077BD3A009EFEC9 /* abc.pcm in Resources */ = {isa = PBXBuildFile; fileRef = 0AB002B02077BD3A009EFEC9 /* abc.pcm */; };
 		0AC97CFB2077C1C2009D94BC /* LLYAudioUnitPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AC97CFA2077C1C2009D94BC /* LLYAudioUnitPlayer.m */; };
 		0ADC67D82078812700CA238C /* record.pcm in Resources */ = {isa = PBXBuildFile; fileRef = 0ADC67D72078812600CA238C /* record.pcm */; };
@@ -89,6 +90,8 @@
 		0A942C632079F75B005EB498 /* LLYAudioUnitConverter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LLYAudioUnitConverter.h; sourceTree = "<group>"; };
 		0A942C642079F75B005EB498 /* LLYAudioUnitConverter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LLYAudioUnitConverter.m; sourceTree = "<group>"; };
 		0A942C662079F787005EB498 /* abc.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = abc.mp3; sourceTree = "<group>"; };
+		0A98667420843FFC0074CC2C /* LLYAudioQueuePlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LLYAudioQueuePlayer.h; sourceTree = "<group>"; };
+		0A98667520843FFC0074CC2C /* LLYAudioQueuePlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LLYAudioQueuePlayer.m; sourceTree = "<group>"; };
 		0AB002B02077BD3A009EFEC9 /* abc.pcm */ = {isa = PBXFileReference; lastKnownFileType = file; path = abc.pcm; sourceTree = "<group>"; };
 		0AC97CF92077C1C2009D94BC /* LLYAudioUnitPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LLYAudioUnitPlayer.h; sourceTree = "<group>"; };
 		0AC97CFA2077C1C2009D94BC /* LLYAudioUnitPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LLYAudioUnitPlayer.m; sourceTree = "<group>"; };
@@ -166,6 +169,8 @@
 				0A7ED6EA207B232200C82126 /* LLYAudioUnitExtPlayer.m */,
 				0A7ED6EC207B772D00C82126 /* LLYAUGraphRecord.h */,
 				0A7ED6ED207B772D00C82126 /* LLYAUGraphRecord.m */,
+				0A98667420843FFC0074CC2C /* LLYAudioQueuePlayer.h */,
+				0A98667520843FFC0074CC2C /* LLYAudioQueuePlayer.m */,
 				0A0FF0BB207788C600B9AEF2 /* AppDelegate.h */,
 				0A0FF0BC207788C600B9AEF2 /* AppDelegate.m */,
 				0A0FF0BE207788C600B9AEF2 /* ViewController.h */,
@@ -392,6 +397,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0ADC67DF2078836200CA238C /* CommonUtil.m in Sources */,
+				0A98667620843FFC0074CC2C /* LLYAudioQueuePlayer.m in Sources */,
 				0A7ED6EB207B232200C82126 /* LLYAudioUnitExtPlayer.m in Sources */,
 				0A0FF0C0207788C600B9AEF2 /* ViewController.m in Sources */,
 				0A774B5A207E18B800442A4D /* LLYAudioPlayer.m in Sources */,

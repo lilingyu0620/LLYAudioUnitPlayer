@@ -15,6 +15,7 @@
 #import "LLYAudioUnitExtPlayer.h"
 #import "LLYAUGraphRecord.h"
 #import "LLYVideoPlayerViewController.h"
+#import "LLYAudioQueuePlayer.h"
 
 @interface ViewController ()<CAAnimationDelegate>
 
@@ -70,6 +71,13 @@
     LLYVideoPlayerViewController *videoPlayerVC = [[LLYVideoPlayerViewController alloc]init];
     [self presentViewController:videoPlayerVC animated:YES completion:nil];
 }
+
+- (IBAction)audioQueuePlayer:(id)sender {
+    
+    LLYAudioQueuePlayer *audioQueuePlayer = [[LLYAudioQueuePlayer alloc]initWithAudioFilePath:[CommonUtil bundlePath:@"/abc.mp3"]];
+    [audioQueuePlayer startPlay];
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
