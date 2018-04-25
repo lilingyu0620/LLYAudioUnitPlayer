@@ -24,6 +24,7 @@
 @property (nonatomic, strong) LLYAudioUnitConverter *converter;
 @property (nonatomic, strong) LLYAudioUnitExtPlayer *extPlayer;
 @property (nonatomic, strong) LLYAUGraphRecord *auGraphPlayer;
+@property (nonatomic, strong) LLYAudioQueuePlayer *audioQueuePlayer;
 
 @end
 
@@ -74,8 +75,9 @@
 
 - (IBAction)audioQueuePlayer:(id)sender {
     
-    LLYAudioQueuePlayer *audioQueuePlayer = [[LLYAudioQueuePlayer alloc]initWithAudioFilePath:[CommonUtil bundlePath:@"/abc.mp3"]];
-    [audioQueuePlayer startPlay];
+    self.audioQueuePlayer = [[LLYAudioQueuePlayer alloc]initWithAudioFilePath:[CommonUtil bundlePath:@"/abc.mp3"]];
+    [self.audioQueuePlayer startPlay];
+//    [self.audioQueuePlayer llystartPlay];
 }
 
 

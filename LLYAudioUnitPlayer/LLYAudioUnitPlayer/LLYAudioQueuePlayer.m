@@ -19,17 +19,23 @@
 @interface LLYAudioQueuePlayer (){
     
     AudioFileStreamID audioFileStreamID;//文件id
+    AudioFileID audioFileID;//
     AudioStreamBasicDescription asbd;//文件基本格式
     AudioQueueBufferRef audioQueueBuffer[kNumberOfBuffers];//buffer数组
     bool inuse[kNumberOfBuffers];//当前buffer使用标记
-    AudioStreamPacketDescription audioStreamPacketDesc[kMaxPacketDesc];//保存音频帧的数组
+    AudioStreamPacketDescription *audioStreamPacketDesc;//保存音频帧的数组
     AudioQueueRef audioQueue;//audio queue实例
     
-    NSLock *audioInUseLock;//线程锁
+    AudioStreamPacketDescription *packetDescs;
+    UInt32 numPacketsToRead;
+    SInt64 packetIndex;
     
-//    pthread_mutex_t mutex;            // a mutex to protect the inuse flags
-//    pthread_cond_t cond;            // a condition varable for handling the inuse flags
-//    pthread_cond_t done;            // a condition varable for handling the inuse flags
+//    NSLock *audioInUseLock;//线程锁
+    
+    pthread_mutex_t mutex;            // a mutex to protect the inuse flags
+    pthread_cond_t cond;            // a condition varable for handling the inuse flags
+    pthread_cond_t done;            // a condition varable for handling the inuse flags
+    
 }
 
 @property (nonatomic, strong) NSFileHandle *audioFileHandle;//文件处理实例句柄
@@ -44,6 +50,8 @@
 @property (nonatomic, assign) NSInteger audioDataBytesFilled;//当前buffer填充的数据大小
 @property (nonatomic, assign) NSInteger audioBufferIndex;//当前填充的buffer序号
 
+@property (nonatomic, copy) NSString *filePath;
+
 @end
 
 @implementation LLYAudioQueuePlayer
@@ -52,13 +60,149 @@
     self = [super init];
     if (self) {
         self.audioFileHandle = [NSFileHandle fileHandleForReadingAtPath:audioFilePath];
-        audioInUseLock = [[NSLock alloc]init];
+//        audioInUseLock = [[NSLock alloc]init];
 //        pthread_mutex_init(&self->mutex, NULL);
 //        pthread_cond_init(&self->cond, NULL);
 //        pthread_cond_init(&self->done, NULL);
+        self.filePath = audioFilePath;
+        
     }
     return self;
 }
+
+static void LLYAudioQueueOutputCallback(void *inUserData,AudioQueueRef inAQ,
+                           AudioQueueBufferRef buffer){
+    LLYAudioQueuePlayer *audioPlayer = (__bridge LLYAudioQueuePlayer *)inUserData;
+    
+    OSStatus status;
+    
+    //读取包数据
+    UInt32 numBytes;
+    UInt32 numPackets = audioPlayer->numPacketsToRead;
+    status = AudioFileReadPackets(audioPlayer->audioFileID, NO, &numBytes, audioPlayer->packetDescs, audioPlayer->packetIndex,&numPackets, buffer->mAudioData);
+    if (status != noErr) {
+        NSLog(@"AudioFileReadPackets 失败");
+    }
+    
+    //成功读取时
+    if (numPackets>0) {
+        //将缓冲的容量设置为与读取的音频数据一样大小(确保内存空间)
+        buffer->mAudioDataByteSize=numBytes;
+        //完成给队列配置缓存的处理
+        status = AudioQueueEnqueueBuffer(audioPlayer->audioQueue, buffer, numPackets, audioPlayer->packetDescs);
+        //移动包的位置
+        audioPlayer->packetIndex += numPackets;
+    }
+
+}
+- (void)startPlay{
+    
+    OSStatus error;
+    
+    error = AudioFileOpenURL((__bridge CFURLRef)[NSURL URLWithString:self.filePath], kAudioFileReadPermission, 0, &audioFileID);
+    if (error != noErr) {
+        NSLog(@"AudioFileOpenURL 失败");
+    }
+    
+    UInt32 ioPropertyDataSize = sizeof(asbd);
+    AudioFileGetProperty(audioFileID, kAudioFilePropertyDataFormat, &ioPropertyDataSize, &asbd);
+    
+    error = AudioQueueNewOutput(&asbd, LLYAudioQueueOutputCallback, (__bridge void * _Nullable)(self), CFRunLoopGetCurrent(), kCFRunLoopCommonModes, 0, &audioQueue);
+    if (error != noErr) {
+        NSLog(@"AudioQueueNewOutput 失败");
+    }
+    
+    [self printAudioStreamBasicDescription:asbd];
+    
+    if (asbd.mBytesPerPacket == 0 || asbd.mFramesPerPacket == 0) {
+        UInt32 maxPacketSize;
+        UInt32 size = sizeof(maxPacketSize);
+        error = AudioFileGetProperty(audioFileID, kAudioFilePropertyPacketSizeUpperBound, &size, &maxPacketSize);
+        if (error != noErr) {
+            NSLog(@"kAudioFilePropertyPacketSizeUpperBound 失败");
+        }
+        if (maxPacketSize > kAQBufSize) {
+            maxPacketSize = kAQBufSize;
+        }
+        
+        numPacketsToRead = kAQBufSize/maxPacketSize;
+        packetDescs = malloc(sizeof(AudioStreamPacketDescription)*numPacketsToRead);
+    }
+    else{
+        numPacketsToRead = kAQBufSize/asbd.mBytesPerPacket;
+        packetDescs = nil;
+    }
+    
+    UInt32 cookieSize;
+    Boolean writeable;
+    error = AudioFileGetProperty(audioFileID, kAudioFilePropertyMagicCookieData, &cookieSize, &writeable);
+    if (error != noErr) {
+        NSLog(@"kAudioFilePropertyMagicCookieSize 失败");
+    }
+    if (cookieSize > 0) {
+        char *cookieData = malloc(sizeof(char) * cookieSize);
+        error = AudioFileGetProperty(audioFileID, kAudioFilePropertyMagicCookieData, &cookieSize, cookieData);
+        if (error != noErr) {
+            NSLog(@"kAudioFilePropertyMagicCookieData 失败");
+        }
+        error = AudioQueueSetProperty(audioQueue, kAudioQueueProperty_MagicCookie, cookieData, cookieSize);
+        if (error != noErr) {
+            NSLog(@"kAudioQueueProperty_MagicCookie 失败");
+        }
+    }
+    
+    packetIndex = 0;
+    
+    for (int i = 0; i < kNumberOfBuffers; i++) {
+        error = AudioQueueAllocateBuffer(audioQueue, kAQBufSize, &audioQueueBuffer[i]);
+        if (error != noErr) {
+            NSLog(@"AudioQueueAllocateBuffer 失败!!!");
+            continue;
+        }
+        //读取包数据
+        if ([self readPacketsIntoBuffer:audioQueueBuffer[i]] == 1) {
+            break;
+        }
+    }
+    
+    Float32 gain=1.0;
+    //设置音量
+    error = AudioQueueSetParameter(audioQueue, kAudioQueueParam_Volume, gain);
+    if (error != noErr) {
+        NSLog(@"AudioQueueSetParameter 失败!!!");
+    }
+    //队列处理开始，此后系统开始自动调用回调(Callback)函数
+    error = AudioQueueStart(audioQueue, nil);
+    if (error != noErr) {
+        NSLog(@"AudioQueueStart 失败!!!");
+    }
+}
+
+-(UInt32)readPacketsIntoBuffer:(AudioQueueBufferRef)buffer {
+    UInt32 numBytes,numPackets;
+    
+    //从文件中接受数据并保存到缓存(buffer)中
+    numPackets = numPacketsToRead;
+    OSStatus error = AudioFileReadPackets(audioFileID, NO, &numBytes, packetDescs, packetIndex, &numPackets, buffer->mAudioData);
+    if (error != noErr) {
+        NSLog(@"AudioFileReadPackets 失败");
+    }
+    if(numPackets >0){
+        buffer->mAudioDataByteSize=numBytes;
+        AudioQueueEnqueueBuffer(audioQueue, buffer, (packetDescs ? numPackets : 0), packetDescs);
+        packetIndex += numPackets;
+    }
+    else{
+        return 1;//意味着我们没有读到任何的包
+    }
+    return 0;//0代表正常的退出
+}
+
+
+
+//--------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------
 
 - (void)createQueue{
     
@@ -69,7 +213,7 @@
 //    4. inCallbackRunLoop：指明回调事件发生在哪个RunLoop之中，如果传递NULL，表示在AudioQueue所在的线程上执行该回调事件，一般情况下，传递NULL即可。
 //    5. inCallbackRunLoopMode：指明回调事件发生的RunLoop的模式，传递NULL相当于kCFRunLoopCommonModes，通常情况下传递NULL即可
 //    6. outAQ：该AudioQueue的引用实例，
-    OSStatus status = AudioQueueNewOutput(&asbd, AudioQueueOutput_Callback, (__bridge void *)self, NULL, NULL, 0, &audioQueue);
+    OSStatus status = AudioQueueNewOutput(&asbd, AudioQueueOutput_Callback, (__bridge void * _Nullable)(self), CFRunLoopGetCurrent(), kCFRunLoopCommonModes, 0, &audioQueue);
     if (status == noErr) {
         for (int i = 0; i < kNumberOfBuffers; i++) {
             
@@ -80,7 +224,11 @@
 //            2. inBufferByteSize：需要开辟的缓冲区的大小
 //            3. outBuffer：开辟的缓冲区的引用实例
             
-            AudioQueueAllocateBuffer(audioQueue, kAQBufSize, &audioQueueBuffer[i]);
+            status = AudioQueueAllocateBuffer(audioQueue, kAQBufSize, &audioQueueBuffer[i]);
+            if (status != noErr) {
+                NSLog(@"AudioQueueAllocateBuffer 失败!!!");
+                continue;
+            }
         }
     }
 }
@@ -92,7 +240,7 @@ void AudioQueueOutput_Callback(void *inClientData,AudioQueueRef inAQ,AudioQueueB
     for (int i = 0; i < kNumberOfBuffers; i++) {
         if (inBuffer == audioPlayer->audioQueueBuffer[i]) {
 //            pthread_mutex_lock(&audioPlayer->mutex);
-//            audioPlayer->inuse[i] = false;
+            audioPlayer->inuse[i] = false;
 //            pthread_cond_signal(&audioPlayer->cond);
 //            printf("MyAudioQueueOutputCallback->unlock\n");
 //            pthread_mutex_unlock(&audioPlayer->mutex);
@@ -102,7 +250,11 @@ void AudioQueueOutput_Callback(void *inClientData,AudioQueueRef inAQ,AudioQueueB
 }
 
 
-- (void)startPlay{
+- (void)llystartPlay{
+    
+    NSError *error;
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
+    [[AVAudioSession sharedInstance] setActive:YES error:&error];
     
     if (audioFileStreamID == NULL) {
         
@@ -160,16 +312,16 @@ void AudioFileStreamPropertyListenerProc(void *inClientData,
     switch (inPropertyID) {
             //该属性指明了音频数据的格式信息，返回的数据是一个AudioStreamBasicDescription结构
         case kAudioFileStreamProperty_DataFormat:{
-            if (audioPlayer->asbd.mSampleRate == 0) {
-                UInt32 ioPropertyDataSize = sizeof(audioPlayer->asbd);
-                //获取音频数据格式
-                 OSStatus error = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_DataFormat, &ioPropertyDataSize, &audioPlayer->asbd);
-                if (error != noErr) {
-                    NSLog(@"获取音频数据格式 失败");
-                    break;
-                }
-                [audioPlayer printAudioStreamBasicDescription:audioPlayer->asbd];
-            }
+//            if (audioPlayer->asbd.mSampleRate == 0) {
+//                UInt32 ioPropertyDataSize = sizeof(audioPlayer->asbd);
+//                //获取音频数据格式
+//                 OSStatus error = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_DataFormat, &ioPropertyDataSize, &audioPlayer->asbd);
+//                if (error != noErr) {
+//                    NSLog(@"获取音频数据格式 失败");
+//                    break;
+//                }
+//                [audioPlayer printAudioStreamBasicDescription:audioPlayer->asbd];
+//            }
         }
             break;
             
@@ -177,13 +329,42 @@ void AudioFileStreamPropertyListenerProc(void *inClientData,
         case kAudioFileStreamProperty_ReadyToProducePackets:{
             
             OSStatus error = noErr;
-            
-            UInt32 packetsCount,ioPropertyDataSize = sizeof(packetsCount);
-            error = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_ReadyToProducePackets, &ioPropertyDataSize, &packetsCount);
+
+            UInt32 ioPropertyDataSize = sizeof(audioPlayer->asbd);
+            //获取音频数据格式
+            error = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_DataFormat, &ioPropertyDataSize, &audioPlayer->asbd);
             if (error != noErr) {
-                NSLog(@"packetsCount error");
+                NSLog(@"获取音频数据格式 失败");
                 break;
             }
+            [audioPlayer printAudioStreamBasicDescription:audioPlayer->asbd];
+            
+            if (audioPlayer->asbd.mBytesPerPacket == 0 || audioPlayer->asbd.mFramesPerPacket == 0) {
+                UInt32 maxPacketSize;
+                UInt32 size = sizeof(maxPacketSize);
+                error = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_PacketSizeUpperBound, &size, &maxPacketSize);
+                if (error != noErr) {
+                    NSLog(@"kAudioFilePropertyPacketSizeUpperBound 失败");
+                }
+                if (maxPacketSize > kAQBufSize) {
+                    maxPacketSize = kAQBufSize;
+                }
+                
+                UInt32 numPacketsToRead = kAQBufSize/maxPacketSize;
+                audioPlayer->audioStreamPacketDesc = malloc(sizeof(AudioStreamPacketDescription)*kMaxPacketDesc);
+            }
+            else{
+//                numPacketsToRead = kAQBufSize/asbd.mBytesPerPacket;
+                audioPlayer->audioStreamPacketDesc = nil;
+            }
+            
+//            UInt32 packetsCount;
+//            ioPropertyDataSize = sizeof(packetsCount);
+//            error = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_ReadyToProducePackets, &ioPropertyDataSize, &packetsCount);
+//            if (error != noErr) {
+//                NSLog(@"packetsCount error");
+//                break;
+//            }
             
             //创建audioqueue
             [audioPlayer createQueue];
@@ -191,7 +372,7 @@ void AudioFileStreamPropertyListenerProc(void *inClientData,
             //get the cookie size
             UInt32 cookieSize;
             Boolean writeable;
-            error = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_MagicCookieData, &cookieSize, &writeable);
+            error = AudioFileStreamGetPropertyInfo(inAudioFileStream, kAudioFileStreamProperty_MagicCookieData, &cookieSize, &writeable);
             if (error != noErr) {
                 NSLog(@"get cookieSize error");
                 break;
@@ -324,13 +505,11 @@ void AudioFileStreamPacketsProc(void *inClientData,
         //如果当前要填充的数据大于缓冲区剩余大小，将当前buffer送入播放队列，指示将当前帧放入到下一个buffer
         if (mDataByteSize > kAQBufSize - audioPlayer.audioDataBytesFilled) {
             
+            audioPlayer->inuse[audioPlayer.audioBufferIndex] = YES;
+
             OSStatus err = AudioQueueEnqueueBuffer(audioPlayer->audioQueue, audioPlayer->audioQueueBuffer[audioPlayer.audioBufferIndex], (UInt32)audioPlayer.audioDataBytesFilled, audioPlayer->audioStreamPacketDesc);
             if (err == noErr) {
-                audioPlayer.audioBufferIndex = (++audioPlayer.audioBufferIndex) % kNumberOfBuffers;
-                audioPlayer.audioPacketsFilled = 0;
-                audioPlayer.audioDataBytesFilled = 0;
-                
-                
+
                 if (!audioPlayer.isPlaying) {
                     err = AudioQueueStart(audioPlayer->audioQueue, NULL);
                     if (err != noErr) {
@@ -339,6 +518,10 @@ void AudioFileStreamPacketsProc(void *inClientData,
                     }
                     audioPlayer.playing = YES;
                 }
+
+                audioPlayer.audioBufferIndex = (++audioPlayer.audioBufferIndex) % kNumberOfBuffers;
+                audioPlayer.audioPacketsFilled = 0;
+                audioPlayer.audioDataBytesFilled = 0;
                 
                 // wait until next buffer is not in use
 //                pthread_mutex_lock(&audioPlayer->mutex);
@@ -353,7 +536,6 @@ void AudioFileStreamPacketsProc(void *inClientData,
         }
         
         AudioQueueBufferRef currentFillBuffer = audioPlayer->audioQueueBuffer[audioPlayer.audioBufferIndex];
-        audioPlayer->inuse[audioPlayer.audioBufferIndex] = YES;
         currentFillBuffer->mAudioDataByteSize = (UInt32)audioPlayer.audioDataBytesFilled + mDataByteSize;
         memcpy(currentFillBuffer->mAudioData + audioPlayer.audioPacketsFilled, inInputData + mStartOffset, mDataByteSize);
         
@@ -380,7 +562,7 @@ void MyAudioQueueIsRunningCallback(void *inClientData,AudioQueueRef inAQ,AudioQu
 //            pthread_cond_signal(&audioPlayer->done);
 //            printf("MyAudioQueueIsRunningCallback->unlock\n");
 //            pthread_mutex_unlock(&audioPlayer->mutex);
-//
+
             AudioQueueReset(audioPlayer->audioQueue);
             for (int i = 0; i < kNumberOfBuffers; i++) {
                 AudioQueueFreeBuffer(audioPlayer->audioQueue, audioPlayer->audioQueueBuffer[i]);
