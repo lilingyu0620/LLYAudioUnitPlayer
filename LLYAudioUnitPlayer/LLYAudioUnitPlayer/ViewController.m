@@ -16,6 +16,8 @@
 #import "LLYAUGraphRecord.h"
 #import "LLYVideoPlayerViewController.h"
 #import "LLYAudioQueuePlayer.h"
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 @interface ViewController ()<CAAnimationDelegate>
 
@@ -76,8 +78,8 @@
 - (IBAction)audioQueuePlayer:(id)sender {
     
     self.audioQueuePlayer = [[LLYAudioQueuePlayer alloc]initWithAudioFilePath:[CommonUtil bundlePath:@"/abc.mp3"]];
-    [self.audioQueuePlayer startPlay];
-//    [self.audioQueuePlayer llystartPlay];
+//    [self.audioQueuePlayer startPlay];
+    [self.audioQueuePlayer llystartPlay];
 }
 
 

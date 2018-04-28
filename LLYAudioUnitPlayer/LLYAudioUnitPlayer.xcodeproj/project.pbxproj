@@ -156,6 +156,7 @@
 		0A0FF0BA207788C600B9AEF2 /* LLYAudioUnitPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				0A7FD4232092B544009D8A8B /* AudioQueue */,
 				0A774B57207E189400442A4D /* videoplayer */,
 				0ADC67DA2078836200CA238C /* utils */,
 				0A0FF0ED2077894600B9AEF2 /* source */,
@@ -245,6 +246,13 @@
 				0A774B64207E19AE00442A4D /* Shader.vsh */,
 			);
 			path = GL;
+			sourceTree = "<group>";
+		};
+		0A7FD4232092B544009D8A8B /* AudioQueue */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = AudioQueue;
 			sourceTree = "<group>";
 		};
 		0ADC67DA2078836200CA238C /* utils */ = {
