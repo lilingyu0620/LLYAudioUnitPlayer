@@ -18,6 +18,7 @@
 #import "LLYAudioQueuePlayer.h"
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import "LLYAudioUnitEffect.h"
 
 @interface ViewController ()<CAAnimationDelegate>
 
@@ -27,7 +28,7 @@
 @property (nonatomic, strong) LLYAudioUnitExtPlayer *extPlayer;
 @property (nonatomic, strong) LLYAUGraphRecord *auGraphPlayer;
 @property (nonatomic, strong) LLYAudioQueuePlayer *audioQueuePlayer;
-
+@property (nonatomic, strong) LLYAudioUnitEffect *audioUnitEffect;
 @end
 
 @implementation ViewController
@@ -79,9 +80,18 @@
     
     self.audioQueuePlayer = [[LLYAudioQueuePlayer alloc]initWithAudioFilePath:[CommonUtil bundlePath:@"/abc.mp3"]];
 //    [self.audioQueuePlayer startPlay];
-    [self.audioQueuePlayer llystartPlay];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+       [self.audioQueuePlayer llystartPlay];
+    });
+    
 }
 
+- (IBAction)audioUnitEffect:(id)sender {
+    
+    self.audioUnitEffect = [[LLYAudioUnitEffect alloc]init];
+    [self.audioUnitEffect start];
+    
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

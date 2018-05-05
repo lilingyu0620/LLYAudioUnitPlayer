@@ -20,7 +20,9 @@ const uint32_t BUFFER_SIZE = 0x10000;
 
 @implementation LLYAudioUnitPlayer{
     AudioUnit playerAudioUnit;
+    AudioUnit effectAuidoUnit;
     NSInputStream *inputStream;
+    AudioBufferList *bufferList;
 }
 
 - (instancetype)initWithPCMPath:(NSString *)pcmPath{
@@ -42,6 +44,13 @@ const uint32_t BUFFER_SIZE = 0x10000;
         [inputStream open];
     }
     
+    // BUFFER
+    bufferList = (AudioBufferList *)malloc(sizeof(AudioBufferList));
+    bufferList->mNumberBuffers = 1;
+    bufferList->mBuffers[0].mNumberChannels = 1;
+    bufferList->mBuffers[0].mDataByteSize = BUFFER_SIZE;
+    bufferList->mBuffers[0].mData = malloc(BUFFER_SIZE);
+    
     //设置audiosession
     NSError *error = nil;
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
@@ -55,9 +64,21 @@ const uint32_t BUFFER_SIZE = 0x10000;
     audioUnitDesc.componentFlags = 0;
     audioUnitDesc.componentFlagsMask = 0;
     
+    AudioComponentDescription effectAuidoUnitDesc;
+    effectAuidoUnitDesc.componentType = kAudioUnitType_Effect;
+    effectAuidoUnitDesc.componentSubType = kAudioUnitSubType_HighPassFilter;
+    effectAuidoUnitDesc.componentManufacturer = kAudioUnitManufacturer_Apple;
+    effectAuidoUnitDesc.componentFlags = 0;
+    effectAuidoUnitDesc.componentFlagsMask = 0;
+    
+    
     //AudioUnit裸创建
     AudioComponent audioComponent = AudioComponentFindNext(NULL, &audioUnitDesc);
     AudioComponentInstanceNew(audioComponent, &playerAudioUnit);
+    
+    AudioComponent effectCompenent = AudioComponentFindNext(NULL, &effectAuidoUnitDesc);
+    AudioComponentInstanceNew(effectCompenent, &effectAuidoUnit);
+    
     
     //通用参数设置,这里是设置扬声器
     OSStatus status = noErr;
@@ -93,7 +114,20 @@ const uint32_t BUFFER_SIZE = 0x10000;
     callbackStruct.inputProcRefCon = (__bridge void *)self;
     AudioUnitSetProperty(playerAudioUnit, kAudioUnitProperty_SetRenderCallback, kAudioUnitScope_Input, outputBus, &callbackStruct, sizeof(callbackStruct));
 
+    
+    AURenderCallbackStruct efcallbackStruct;
+    efcallbackStruct.inputProc = EffectAudioUnitRenderCallback;
+    callbackStruct.inputProcRefCon = (__bridge void*)self;
+    status = AudioUnitSetProperty(effectAuidoUnit,
+                                  kAudioUnitProperty_SetRenderCallback,
+                                  kAudioUnitScope_Global,
+                                  0,
+                                  &efcallbackStruct,
+                                  sizeof(efcallbackStruct));
+    
     OSStatus result = AudioUnitInitialize(playerAudioUnit);
+    NSLog(@"result = %d",result);
+    result = AudioUnitInitialize(effectAuidoUnit);
     NSLog(@"result = %d",result);
     
 }
@@ -103,11 +137,13 @@ const uint32_t BUFFER_SIZE = 0x10000;
     [self initAudioUnit];
     
     AudioOutputUnitStart(playerAudioUnit);
+    AudioOutputUnitStart(effectAuidoUnit);
 }
 
 - (void)stop{
     
     AudioOutputUnitStop(playerAudioUnit);
+    AudioOutputUnitStop(effectAuidoUnit);
     [inputStream close];
 }
 
@@ -124,6 +160,17 @@ static OSStatus PlayCallback(void *inRefCon,AudioUnitRenderActionFlags *ioAction
             [play stop];
         });
     }
+    return noErr;
+}
+
+static OSStatus EffectAudioUnitRenderCallback(void *inRefCon,
+                                          AudioUnitRenderActionFlags *ioActionFlags,
+                                          const AudioTimeStamp *inTimeStamp,
+                                          UInt32 inBusNumber,
+                                          UInt32 inNumberFrames,
+                                          AudioBufferList *ioData){
+    __unsafe_unretained LLYAudioUnitPlayer *play = (__bridge LLYAudioUnitPlayer *)inRefCon;
+    
     return noErr;
 }
 @end

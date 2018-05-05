@@ -15,6 +15,7 @@
 		0A0FF0CB207788C600B9AEF2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A0FF0CA207788C600B9AEF2 /* main.m */; };
 		0A0FF0D5207788C600B9AEF2 /* LLYAudioUnitPlayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A0FF0D4207788C600B9AEF2 /* LLYAudioUnitPlayerTests.m */; };
 		0A0FF10120778A1C00B9AEF2 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A0FF10020778A1C00B9AEF2 /* AVFoundation.framework */; };
+		0A1F5819209DA18200D3EEBD /* LLYAudioUnitEffect.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A1F5818209DA18200D3EEBD /* LLYAudioUnitEffect.m */; };
 		0A774B5A207E18B800442A4D /* LLYAudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A774B59207E18B800442A4D /* LLYAudioPlayer.m */; };
 		0A774B5E207E18F000442A4D /* LLYVideoPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A774B5C207E18F000442A4D /* LLYVideoPlayerViewController.m */; };
 		0A774B5F207E18F000442A4D /* LLYVideoPlayerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A774B5D207E18F000442A4D /* LLYVideoPlayerViewController.xib */; };
@@ -73,6 +74,8 @@
 		0A0FF0E1207788C600B9AEF2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0A0FF10020778A1C00B9AEF2 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		0A0FF10220778A2700B9AEF2 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
+		0A1F5817209DA18200D3EEBD /* LLYAudioUnitEffect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LLYAudioUnitEffect.h; sourceTree = "<group>"; };
+		0A1F5818209DA18200D3EEBD /* LLYAudioUnitEffect.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LLYAudioUnitEffect.m; sourceTree = "<group>"; };
 		0A774B58207E18B800442A4D /* LLYAudioPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LLYAudioPlayer.h; sourceTree = "<group>"; };
 		0A774B59207E18B800442A4D /* LLYAudioPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LLYAudioPlayer.m; sourceTree = "<group>"; };
 		0A774B5B207E18F000442A4D /* LLYVideoPlayerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LLYVideoPlayerViewController.h; sourceTree = "<group>"; };
@@ -156,7 +159,6 @@
 		0A0FF0BA207788C600B9AEF2 /* LLYAudioUnitPlayer */ = {
 			isa = PBXGroup;
 			children = (
-				0A7FD4232092B544009D8A8B /* AudioQueue */,
 				0A774B57207E189400442A4D /* videoplayer */,
 				0ADC67DA2078836200CA238C /* utils */,
 				0A0FF0ED2077894600B9AEF2 /* source */,
@@ -172,6 +174,8 @@
 				0A7ED6ED207B772D00C82126 /* LLYAUGraphRecord.m */,
 				0A98667420843FFC0074CC2C /* LLYAudioQueuePlayer.h */,
 				0A98667520843FFC0074CC2C /* LLYAudioQueuePlayer.m */,
+				0A1F5817209DA18200D3EEBD /* LLYAudioUnitEffect.h */,
+				0A1F5818209DA18200D3EEBD /* LLYAudioUnitEffect.m */,
 				0A0FF0BB207788C600B9AEF2 /* AppDelegate.h */,
 				0A0FF0BC207788C600B9AEF2 /* AppDelegate.m */,
 				0A0FF0BE207788C600B9AEF2 /* ViewController.h */,
@@ -246,13 +250,6 @@
 				0A774B64207E19AE00442A4D /* Shader.vsh */,
 			);
 			path = GL;
-			sourceTree = "<group>";
-		};
-		0A7FD4232092B544009D8A8B /* AudioQueue */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = AudioQueue;
 			sourceTree = "<group>";
 		};
 		0ADC67DA2078836200CA238C /* utils */ = {
@@ -405,6 +402,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0ADC67DF2078836200CA238C /* CommonUtil.m in Sources */,
+				0A1F5819209DA18200D3EEBD /* LLYAudioUnitEffect.m in Sources */,
 				0A98667620843FFC0074CC2C /* LLYAudioQueuePlayer.m in Sources */,
 				0A7ED6EB207B232200C82126 /* LLYAudioUnitExtPlayer.m in Sources */,
 				0A0FF0C0207788C600B9AEF2 /* ViewController.m in Sources */,
