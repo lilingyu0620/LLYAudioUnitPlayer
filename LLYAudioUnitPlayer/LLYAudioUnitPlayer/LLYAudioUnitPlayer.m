@@ -66,7 +66,7 @@ const uint32_t BUFFER_SIZE = 0x10000;
     
     AudioComponentDescription effectAuidoUnitDesc;
     effectAuidoUnitDesc.componentType = kAudioUnitType_Effect;
-    effectAuidoUnitDesc.componentSubType = kAudioUnitSubType_HighPassFilter;
+    effectAuidoUnitDesc.componentSubType = kAudioUnitSubType_Reverb2;
     effectAuidoUnitDesc.componentManufacturer = kAudioUnitManufacturer_Apple;
     effectAuidoUnitDesc.componentFlags = 0;
     effectAuidoUnitDesc.componentFlagsMask = 0;
@@ -107,6 +107,7 @@ const uint32_t BUFFER_SIZE = 0x10000;
     if (status) {
         NSLog(@"AudioUnitSetProperty error with status:%d", status);
     }
+    
     
     //callback
     AURenderCallbackStruct callbackStruct;
@@ -170,6 +171,8 @@ static OSStatus EffectAudioUnitRenderCallback(void *inRefCon,
                                           UInt32 inNumberFrames,
                                           AudioBufferList *ioData){
     __unsafe_unretained LLYAudioUnitPlayer *play = (__bridge LLYAudioUnitPlayer *)inRefCon;
+    ioData->mBuffers[0].mDataByteSize = (UInt32)[play->inputStream read:ioData->mBuffers[0].mData maxLength:(NSInteger)ioData->mBuffers[0].mDataByteSize];
+    NSLog(@"out size: %d", ioData->mBuffers[0].mDataByteSize);
     
     return noErr;
 }

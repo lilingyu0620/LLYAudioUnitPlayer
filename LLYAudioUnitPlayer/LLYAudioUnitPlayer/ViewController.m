@@ -36,12 +36,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a ni
-//    [[PAirSandbox sharedInstance] showSandboxBrowser];
+    [[PAirSandbox sharedInstance] showSandboxBrowser];
 }
 
 - (IBAction)playPCM:(id)sender {
     
-    NSString *abcPCMPath = [CommonUtil bundlePath:@"/abc.pcm"];
+    NSString *abcPCMPath = [CommonUtil bundlePath:@"/test.pcm"];
     self.player = [[LLYAudioUnitPlayer alloc]initWithPCMPath:abcPCMPath];
     [self.player play];
 }

@@ -16,6 +16,7 @@
 		0A0FF0D5207788C600B9AEF2 /* LLYAudioUnitPlayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A0FF0D4207788C600B9AEF2 /* LLYAudioUnitPlayerTests.m */; };
 		0A0FF10120778A1C00B9AEF2 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A0FF10020778A1C00B9AEF2 /* AVFoundation.framework */; };
 		0A1F5819209DA18200D3EEBD /* LLYAudioUnitEffect.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A1F5818209DA18200D3EEBD /* LLYAudioUnitEffect.m */; };
+		0A27002520DE572200A4607A /* record2.pcm  in Resources */ = {isa = PBXBuildFile; fileRef = 0A27002420DE572100A4607A /* record2.pcm  */; };
 		0A774B5A207E18B800442A4D /* LLYAudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A774B59207E18B800442A4D /* LLYAudioPlayer.m */; };
 		0A774B5E207E18F000442A4D /* LLYVideoPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A774B5C207E18F000442A4D /* LLYVideoPlayerViewController.m */; };
 		0A774B5F207E18F000442A4D /* LLYVideoPlayerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A774B5D207E18F000442A4D /* LLYVideoPlayerViewController.xib */; };
@@ -76,6 +77,7 @@
 		0A0FF10220778A2700B9AEF2 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
 		0A1F5817209DA18200D3EEBD /* LLYAudioUnitEffect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LLYAudioUnitEffect.h; sourceTree = "<group>"; };
 		0A1F5818209DA18200D3EEBD /* LLYAudioUnitEffect.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LLYAudioUnitEffect.m; sourceTree = "<group>"; };
+		0A27002420DE572100A4607A /* record2.pcm  */ = {isa = PBXFileReference; lastKnownFileType = file; path = "record2.pcm "; sourceTree = "<group>"; };
 		0A774B58207E18B800442A4D /* LLYAudioPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LLYAudioPlayer.h; sourceTree = "<group>"; };
 		0A774B59207E18B800442A4D /* LLYAudioPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LLYAudioPlayer.m; sourceTree = "<group>"; };
 		0A774B5B207E18F000442A4D /* LLYVideoPlayerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LLYVideoPlayerViewController.h; sourceTree = "<group>"; };
@@ -209,6 +211,7 @@
 		0A0FF0ED2077894600B9AEF2 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				0A27002420DE572100A4607A /* record2.pcm  */,
 				0A774B68207E2A9300442A4D /* abc.mp4 */,
 				0A942C662079F787005EB498 /* abc.mp3 */,
 				0ADC67D72078812600CA238C /* record.pcm */,
@@ -369,6 +372,7 @@
 				0A774B65207E19AE00442A4D /* Shader.fsh in Resources */,
 				0ADC67E5207896BF00CA238C /* test.pcm in Resources */,
 				0ADC67D82078812700CA238C /* record.pcm in Resources */,
+				0A27002520DE572200A4607A /* record2.pcm  in Resources */,
 				0A774B5F207E18F000442A4D /* LLYVideoPlayerViewController.xib in Resources */,
 				0A774B67207E19AE00442A4D /* Shader.vsh in Resources */,
 				0A0FF0C8207788C600B9AEF2 /* LaunchScreen.storyboard in Resources */,
